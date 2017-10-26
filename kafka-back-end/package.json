@@ -1,0 +1,26 @@
+{
+  "name": "hk",
+  "version": "1.0.0",
+  "description": "package.json",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "author": "hk",
+  "license": "MIT",
+  "dependencies": {
+    "kafka-node": "^2.2.3",
+    "passport": "^0.4.0",
+    "mongodb": "^2.2.31",
+    "passport-local": "^1.0.0"
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "ok"
+  },
+  "keywords": [
+    "hk"
+  ]
+}
