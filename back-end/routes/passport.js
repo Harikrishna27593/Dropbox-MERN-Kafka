@@ -5,8 +5,8 @@ var kafka = require('./kafka/client');
 
 module.exports = function(passport) {
     passport.use('login', new LocalStrategy(function(username , password, done) {
-        console.log('in passport');
-        kafka.make_request('login_topic',{"username":username,"password":password}, function(err,results){
+        console.log('in ikikpassport');
+        kafka.make_request('login-topic',{"username":username,"password":password}, function(err,results){
             console.log('in result');
             console.log(results);
             if(err){
@@ -33,6 +33,37 @@ module.exports = function(passport) {
             done(e,{});
         }*/
     }));
+
+    passport.use('signup', new LocalStrategy({
+        passReqToCallback : true
+    },
+        function(req,username , password, done) {
+        console.log('in sdsdpassport');
+        console.log(req.body.firstname)
+        console.log(req.body.lastname)
+        console.log(password)
+        console.log(username)
+        kafka.make_request('signup-topic',{"firstname":req.body.firstname,"lastname":req.body.lastname,"username":username,"password":password}, function(err,results){
+            console.log('in result');
+            console.log(results);
+            if(err){
+                done(err,{});
+            }
+            else
+            {
+                console.log("in passport else")
+                if(results.code == 200){
+                    done(null,{username:username});
+                }
+                else {
+                    done(null,false);
+                }
+            }
+        });
+    }));
+
+
+
 };
 
 
