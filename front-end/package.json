@@ -8,7 +8,11 @@
     "react-dom": "^15.6.1",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.0.13",
-    "should": "^13.1.2"
+    "should": "^13.1.2",
+    "sweetalert": "^2.0.6",
+    "axios": "^0.16.2",
+    "material-ui": "^1.0.0-beta.16",
+    "typed-material-ui": "^0.17.1"
   },
   "scripts": {
     "start": "react-scripts start",
