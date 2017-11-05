@@ -1,5 +1,7 @@
 var mongo = require("./mongo");
-var mongoURL = "mongodb://localhost:27017/login";
+var mongoURL = "mongodb://localhost:27017/Dropbox";
+var moment= require('moment');
+var bcrypt = require('bcrypt');
 function handle_request(msg, callback){
     var res = {};
     try {
@@ -12,9 +14,34 @@ function handle_request(msg, callback){
 
             coll.findOne({username: msg.username}, function(err, user){
                 if (user) {
-                    console.log("if condition")
-                    res.code = "200";
-                    res.value = "Success Login";
+                    var Login="Loggedin";
+                    var d = moment().format('MMMM Do YYYY h:mm:ss a')
+                    var coll = mongo.collection('Activity');
+                    try {
+                        var orgPassword = bcrypt.compareSync(msg.password, user.password);
+                    }
+                    catch(e){
+                        res.code = "401";
+                        res.value = "Failed Login";
+                    }
+
+                    if(orgPassword) {
+                        res.code = "200";
+                        res.value = "Success Login";
+
+                    }
+                    else {
+                        console.log('password mismatch')
+                        res.code = "401";
+                        res.value = "Failed Login";
+                    }
+
+                    coll.save({
+                        USERNAME: msg.username,
+                        ACTIVITY_TIME: d,
+                        Activity: Login
+                    })
+
                     callback(null, res);
 
                 } else {
