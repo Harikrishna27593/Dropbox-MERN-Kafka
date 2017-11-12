@@ -82,9 +82,12 @@ app.post('/dosignup', function(req, res) {
         if(err) {
             res.status(401).send();
         }
-        else {
-                return res.status(201).send();
 
+        if(user){
+            return res.status(201).send();
+        }
+        else {
+            return res.status(401).send();
         }
     })(req, res);
 
@@ -110,10 +113,11 @@ app.post('/dosignup', function(req, res) {
 
 
 app.post('/upload',function(req, res) {
-    kafka.make_request('upload-topic',{"filebuffer":req.files.mypic.data,"filename":req.files.mypic.name,"username":req.session.user}, function(err,results){
-        console.log('in result');
-        console.log(results);
-        console.log(results.code);
+    console.log(req.body.val)
+    kafka.make_request('upload-topic',{"filebuffer":req.files.mypic.data,"filename":req.files.mypic.name,"username":req.session.user,"isdirectory":req.body.val,"direcname":req.body.fname}, function(err,results){
+        //console.log('in result');
+       // console.log(results);
+        //console.log(results.code);
         if(err){
             res.status(401).send();
         }
@@ -129,6 +133,25 @@ app.post('/upload',function(req, res) {
     });
 });
 
+app.get('/showActivity',function(req, res) {
+    kafka.make_request('Activity-topic',{"username":req.session.user}, function(err,results){
+        console.log('in result');
+        console.log(results);
+        console.log(results.code);
+        if(err){
+            res.status(401).send();
+        }
+        else
+        {
+            if(results.code == 200){
+                return res.status(200).send(results.arr);
+            }
+            else {
+                res.status(401).send();
+            }
+        }
+    });
+});
 
 
 
@@ -250,6 +273,200 @@ app.post('/share',function(req, res) {
     });
 });
 
+
+
+app.post('/profile', function(req, res) {
+     kafka.make_request('profile-topic',{"NAME":req.body.name,"EMAIL":req.body.email,"WORK":req.body.work,"EDUCATION":req.body.edu,"CONTACT":req.body.contact,"INTERESTS":req.body.interests,"LANG_PREF":req.body.lang_pref}, function(err,results){
+         console.log('in result');
+         console.log(results);
+         console.log(results.code);
+         if(err){
+             res.status(401).send();
+         }
+         else
+         {
+             if(results.code == 204){
+                 return res.status(201).send({username: "test"});
+             }
+             else {
+                 res.status(401).send();
+             }
+         }
+     });
+});
+
+
+app.post('/directory', function(req, res) {
+    console.log(req.session.user);
+     kafka.make_request('directory-topic',{"username":req.session.user,"folder":req.body.folder}, function(err,results){
+         console.log('in result');
+         console.log(results);
+         console.log(results.code);
+         if(err){
+             res.status(401).send();
+         }
+         else
+         {
+             if(results.code == 204){
+                 console.log('in result');
+                 return res.status(204).send({username: "test"});
+             }
+             else {
+                 res.status(401).send();
+             }
+         }
+     });
+});
+
+
+// app.post('/getfilesindirec', function(req, res) {
+//     console.log(req.session.user);
+//     console.log(req.param('fname'))
+//     kafka.make_request('filesindirec-topic',{"username":req.session.user,"folder":req.param('name')}, function(err,results){
+//         console.log('in result');
+//         console.log(results);
+//         console.log(results.code);
+//         if(err){
+//             res.status(401).send();
+//         }
+//         else
+//         {
+//             if(results.code == 200){
+//                 console.log('in result');
+//                 return res.send(results.arr);
+//             }
+//             else {
+//                 res.status(401).send();
+//             }
+//         }
+//     });
+// });
+
+
+app.get('/getdetails',function(req, res) {
+    kafka.make_request('Displayuserinfo-topic',{"username":req.session.user}, function(err,results){
+        console.log('in resultdisp');
+        console.log(results);
+        console.log(results.code);
+        if(err){
+            res.status(401).send();
+        }
+        else
+        {
+            if(results.code == 200){
+                return res.status(200).send(results.arr);
+            }
+            else {
+                res.status(401).send();
+            }
+        }
+    });
+});
+
+app.post('/Groupcreation',function (req,res) {
+    kafka.make_request('group-topic',{"username":req.session.user,"group":req.body.group},function (err,results) {
+        if(results.code === '200'){
+            res.status(201).send();
+        }
+        else {
+            res.status(400).send();
+        }
+    });
+});
+app.get('/listgroups',function (req,res) {
+    kafka.make_request('Listofgroups-topic',{"username":req.session.user},function (err,results) {
+        if(err){
+            res.status(401).send();
+        }
+        else
+        {
+            if(results.code == 200){
+                console.log(results.arr)
+                return res.status(201).send(results.arr);
+            }
+            else {
+                res.status(401).send();
+            }
+        }
+    });
+});
+
+
+app.post('/addmemberingroup',function (req,res) {
+    kafka.make_request('addmemberingroup-topic',{"username":req.body.name,"groupname":req.body.groupname}, function(err,results){
+        console.log('in result');
+        console.log(results.code);
+        console.log(results.code);
+        if(err){
+            res.status(500).send();
+        }
+        if(results.code === '204'){
+            res.status(201).send();
+        }
+        else {
+            res.status(401).send();
+        }
+    });
+});
+
+app.get('/groupmembers',function (req,res) {
+    kafka.make_request('getgroupmembers-topic',{"username":req.session.user,"groupname":req.query.groupname},function (err,results) {
+        if(err){
+            res.status(401).send();
+        }
+        else
+        {
+            if(results.code == 200){
+                console.log(results.arr)
+                return res.status(201).send(results.arr);
+            }
+            else {
+                res.status(401).send();
+            }
+        }
+    })
+});
+
+
+app.post('/deletegroup',function(req, res) {
+    kafka.make_request('deletegroup-topic',{"groupname":req.body.groupname}, function(err,results){
+        console.log('in result');
+        console.log(results);
+        console.log(results.code);
+        if(err){
+            res.status(401).send();
+        }
+        else
+        {
+            if(results.code == 204){
+                return res.status(204).send({username: "test"});
+            }
+            else {
+                res.status(401).send();
+            }
+        }
+    });
+});
+
+app.post('/deletememberfromgroup',function(req, res) {
+    kafka.make_request('deletememberfromgroup-topic',{"member":req.body.membername,"groupname":req.body.groupname}, function(err,results){
+        console.log('in result');
+        console.log(results);
+        console.log(results.code);
+        if(err){
+            res.status(401).send();
+        }
+        else
+        {
+            if(results.code == 204){
+                return res.status(204).send({username: "test"});
+            }
+            else {
+                res.status(401).send();
+            }
+        }
+    });
+});
 
 app.post('/logout', function(req,res) {
     console.log(req.session.user);

@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon --harmony ./bin/www"
+    "start": "nodemon --harmony ./bin/www",
+    "test": "mocha"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
@@ -19,7 +20,9 @@
     "glob": "^7.1.2",
     "kafka-node": "^2.2.3",
     "morgan": "~1.6.1",
+    "mocha": "^4.0.1",
     "multer": "^1.3.0",
+    "request": "*",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
     "serve-favicon": "~2.3.0"
